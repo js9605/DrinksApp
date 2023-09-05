@@ -10,10 +10,6 @@ from rest_framework import status
 def drink_list(request):
 
     if request.method == 'GET':
-        #get all the drinks
-        #serialize them
-        #get json
-        
         drinks = Drink.objects.all()    
         serializer = DrinkSerializer(drinks, many=True)
         return JsonResponse({"drinks" : serializer.data})
@@ -37,7 +33,12 @@ def drink_detail(request, id):
     if request.method == 'GET':
         serializer = DrinkSerializer(drink)
         return Response(serializer.data)
-    elif request.method == 'POST':
-        pass
+    elif request.method == 'PUT':
+        serializer = DrinkSerializer(drink, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     elif request.method == 'DELETE':
-        pass
+        drink.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
